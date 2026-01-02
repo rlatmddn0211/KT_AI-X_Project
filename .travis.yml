@@ -1,0 +1,54 @@
+language: python
+python:
+  - "3.10"
+
+services:
+  - docker
+env:
+  global:
+    - AWS_REGION=ap-northeast-2
+    - AWS_ACCOUNT_ID=132786726624
+    - ECR_REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+    - REPO_NAME=plant-ai
+    - EC2_HOST=3.37.197.254
+    - EC2_USER=ubuntu
+
+before_install:
+  - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+  - unzip awscliv2.zip
+  - sudo ./aws/install
+
+script:  
+  - echo "Logging in to Amazon ECR..."
+  - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REGISTRY    
+  - echo "Building Docker image..."
+  - docker build -t $REPO_NAME .  
+  
+  - |
+    if [ "$TRAVIS_BRANCH" == "main" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
+      echo "On main branch: Pushing image to ECR..."
+      docker tag $REPO_NAME:latest $ECR_REGISTRY/$REPO_NAME:latest
+      docker push $ECR_REGISTRY/$REPO_NAME:latest
+    else
+      echo "Not on main branch: Skipping ECR Push."
+    fi
+
+after_success:
+  - |
+    if [ "$TRAVIS_BRANCH" == "main" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
+      echo "On main branch: Deploying to EC2..."
+      
+      echo "$PRIVATE_KEY" | base64 -d > private_key.pem
+      chmod 600 private_key.pem
+      
+      ssh -o StrictHostKeyChecking=no -i private_key.pem $EC2_USER@$EC2_HOST "
+        aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin $ECR_REGISTRY &&
+        docker pull $ECR_REGISTRY/$REPO_NAME:latest &&
+        docker stop $REPO_NAME || true &&
+        docker rm $REPO_NAME || true &&
+        docker run -d --name $REPO_NAME -p 8000:8000 $ECR_REGISTRY/$REPO_NAME:latest
+      "
+      echo "Deployment Completed Successfully!"
+    else
+      echo "Not on main branch: Skipping EC2 Deployment."
+    fi

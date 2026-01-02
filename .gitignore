@@ -1,0 +1,40 @@
+# 1. 🐍 Python 가상 환경 제외 (가장 중요)
+/plant/
+.venv
+venv/
+env/
+
+# 2. 📁 Python 임시/캐시 파일 제외
+__pycache__/
+*.pyc
+*.pyo
+
+# 3. 📦 빌드 및 배포 관련 파일 제외
+build/
+dist/
+*.egg-info/
+.installed.cfg
+MANIFEST
+
+# 4. 💻 IDE 및 운영체제 파일 제외
+.DS_Store          # macOS 파일
+.vscode/           # VS Code 설정 폴더 (개인 설정)
+.idea/             # PyCharm 등 JetBrains IDE 설정 폴더
+
+# 5. 🧪 테스트/커버리지 파일 제외
+.pytest_cache/
+htmlcov/
+.coverage
+
+# 6. 🖼️ AI/ML 모델 및 데이터 파일 제외 (선택 사항)
+# 프로젝트에 대용량 학습 데이터나 모델 파일이 있다면 제외합니다.
+*.pt       # PyTorch 모델 파일
+*.h5       # Keras/TensorFlow 모델 파일
+*.onnx     # ONNX 모델 파일
+/data/     # 학습 데이터 폴더
+*.csv      # 대용량 CSV 파일
+/plant_env/Include
+/plant_env/Scripts
+/plant_env/Lib/site-packages
+# 7. 🔑 환경 변수 파일 제외 (보안)
+.env
