@@ -41,4 +41,4 @@ YOLOv11-Nano를 활용해 잎(Leaf) 단위를 탐지하고, MobileNetV3를 통�
 🔗 More Information
 For a more in-depth look at the project overview, technical challenges, and the research journey behind this implementation, please visit my GitHub blog:
 
-👉 Check out the detailed project review on my blog
+👉 **[My GitHub Blog: 식물을 부탁해 프로젝트 리뷰 보러가기](https://rlatmddn0211.github.io/seungwoo_blog/)**
